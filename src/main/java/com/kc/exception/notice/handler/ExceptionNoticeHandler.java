@@ -30,7 +30,7 @@ import java.util.concurrent.*;
 @Slf4j
 public class ExceptionNoticeHandler {
 
-    private final String SEPARATOR = System.getProperty("line.separator");
+    private final String separator = System.lineSeparator();
 
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
@@ -49,11 +49,12 @@ public class ExceptionNoticeHandler {
     /**
      * 将捕获到的异常信息封装好之后发送到阻塞队列
      */
-    public Boolean createNotice(Exception ex, JoinPoint joinPoint) {
+    @SuppressWarnings("java:S899")
+    public void createNotice(Exception ex, JoinPoint joinPoint) {
         if (containsException(ex)) {
-            return null;
+            return;
         }
-        log.error("捕获到异常开始发送消息通知:{}method:{}--->", SEPARATOR, joinPoint.getSignature().getName());
+        log.error("捕获到异常开始发送消息通知:{}method:{}--->", separator, joinPoint.getSignature().getName());
         //获取请求参数
         Object parameter = getParameter(joinPoint);
         //获取当前请求对象
@@ -62,12 +63,12 @@ public class ExceptionNoticeHandler {
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();
             //获取请求地址
-            address = request.getRequestURL().toString() + ((request.getQueryString() != null && request.getQueryString().length() > 0) ? "?" + request.getQueryString() : "");
+            address = request.getRequestURL().toString() + ((request.getQueryString() != null && !request.getQueryString().isEmpty()) ? "?" + request.getQueryString() : "");
         }
 
         ExceptionInfo exceptionInfo = new ExceptionInfo(ex, joinPoint.getSignature().getName(), exceptionProperties.getIncludedTracePackage(), parameter, address);
         exceptionInfo.setProject(exceptionProperties.getProjectName());
-        return exceptionInfoBlockingDeque.offer(exceptionInfo);
+        exceptionInfoBlockingDeque.offer(exceptionInfo);
     }
 
     /**
@@ -121,7 +122,7 @@ public class ExceptionNoticeHandler {
                 argList.add(map);
             }
         }
-        if (argList.size() == 0) {
+        if (argList.isEmpty()) {
             return null;
         } else if (argList.size() == 1) {
             return argList.get(0);

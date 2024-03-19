@@ -21,6 +21,8 @@ import static java.util.stream.Collectors.toList;
 @Data
 public class ExceptionInfo {
 
+    public static final String FONT_STR = "</font>";
+    public static final String YYYYMMDD_HHMMSS_STR = "yyyy-MM-dd HH:mm:ss";
     /**
      * 工程名
      */
@@ -75,10 +77,10 @@ public class ExceptionInfo {
         List<StackTraceElement> list = Arrays.stream(ex.getStackTrace())
                 .filter(x -> filterTrace == null || x.getClassName().startsWith(filterTrace))
                 .filter(x -> !"<generated>".equals(x.getFileName())).collect(toList());
-        if (list.size() > 0) {
-            this.traceInfo = list.stream().map(StackTraceElement::toString).collect(toList());
-            this.methodName = null == methodName ? list.get(0).getMethodName() : methodName;
+        if (!list.isEmpty()) {
             this.classPath = list.get(0).getClassName();
+            this.methodName = null == methodName ? list.get(0).getMethodName() : methodName;
+            this.traceInfo = list.stream().map(StackTraceElement::toString).collect(toList());
         }
         this.uid = calUid();
     }
@@ -87,14 +89,14 @@ public class ExceptionInfo {
     private String gainExceptionMessage(Throwable exception) {
         String em = exception.toString();
         if (exception.getCause() != null) {
-            em = String.format("%s\r\n\tcaused by : %s", em, gainExceptionMessage(exception.getCause()));
+            em = em + "\r\n\tcaused by : " + gainExceptionMessage(exception.getCause());
         }
         return em;
     }
 
     private String calUid() {
         return DigestUtils.md5DigestAsHex(
-                String.format("%s-%s", exceptionMessage, traceInfo.size() > 0 ? traceInfo.get(0) : "").getBytes());
+                String.format("%s-%s", exceptionMessage, !traceInfo.isEmpty() ? traceInfo.get(0) : "").getBytes());
     }
 
     @SneakyThrows
@@ -110,24 +112,24 @@ public class ExceptionInfo {
         stringBuilder.append("异常信息：").append("\n").append(exceptionMessage).append("\n");
         stringBuilder.append("异常追踪：").append("\n").append(String.join("\n", traceInfo)).append("\n");
         stringBuilder.append("最后一次出现时间：")
-                .append(latestShowTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                .append(latestShowTime.format(DateTimeFormatter.ofPattern(YYYYMMDD_HHMMSS_STR)));
         return stringBuilder.toString();
     }
 
     @SneakyThrows
     public String createWeChatMarkDown() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(">项目名称：<font color=\"info\">").append(project).append("</font>").append("\n");
-        stringBuilder.append(">类路径：<font color=\"info\">").append(classPath).append("</font>").append("\n");
-        stringBuilder.append(">请求地址：<font color=\"info\">").append(reqAddress).append("</font>").append("\n");
-        stringBuilder.append(">方法名：<font color=\"info\">").append(methodName).append("</font>").append("\n");
+        stringBuilder.append(">项目名称：<font color=\"info\">").append(project).append(FONT_STR).append("\n");
+        stringBuilder.append(">类路径：<font color=\"info\">").append(classPath).append(FONT_STR).append("\n");
+        stringBuilder.append(">请求地址：<font color=\"info\">").append(reqAddress).append(FONT_STR).append("\n");
+        stringBuilder.append(">方法名：<font color=\"info\">").append(methodName).append(FONT_STR).append("\n");
         if (params != null) {
-            stringBuilder.append(">方法参数：<font color=\"info\">").append(objectMapper.writeValueAsString(params)).append("</font>").append("\n");
+            stringBuilder.append(">方法参数：<font color=\"info\">").append(objectMapper.writeValueAsString(params)).append(FONT_STR).append("\n");
         }
-        stringBuilder.append(">异常信息：<font color=\"red\">").append("\n").append(exceptionMessage).append("</font>").append("\n");
-        stringBuilder.append(">异常追踪：<font color=\"info\">").append("\n").append(String.join("\n", traceInfo)).append("</font>").append("\n");
+        stringBuilder.append(">异常信息：<font color=\"red\">").append("\n").append(exceptionMessage).append(FONT_STR).append("\n");
+        stringBuilder.append(">异常追踪：<font color=\"info\">").append("\n").append(String.join("\n", traceInfo)).append(FONT_STR).append("\n");
         stringBuilder.append(">最后一次出现时间：<font color=\"info\">")
-                .append(latestShowTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("</font>");
+                .append(latestShowTime.format(DateTimeFormatter.ofPattern(YYYYMMDD_HHMMSS_STR))).append(FONT_STR);
         return stringBuilder.toString();
     }
 
@@ -144,7 +146,7 @@ public class ExceptionInfo {
         stringBuilder.append("#### 异常信息：").append("\n").append("> ").append(exceptionMessage).append("\n");
         stringBuilder.append("#### 异常追踪：").append("\n").append("> ").append(String.join("\n", traceInfo)).append("\n");
         stringBuilder.append("#### 最后一次出现时间：")
-                .append(latestShowTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                .append(latestShowTime.format(DateTimeFormatter.ofPattern(YYYYMMDD_HHMMSS_STR)));
         return stringBuilder.toString();
     }
 

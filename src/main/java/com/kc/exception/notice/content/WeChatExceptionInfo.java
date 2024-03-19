@@ -38,9 +38,9 @@ public class WeChatExceptionInfo {
 
         private String content;
 
-        private String[] mentioned_list;
+        private String[] mentionedArr;
 
-        private String[] mentioned_mobile_list;
+        private String[] mentionedMobileArr;
 
     }
 
