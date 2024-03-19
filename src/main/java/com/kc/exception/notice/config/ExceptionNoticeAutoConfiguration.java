@@ -3,14 +3,13 @@ package com.kc.exception.notice.config;
 import com.kc.exception.notice.aop.ExceptionListener;
 import com.kc.exception.notice.handler.ExceptionNoticeHandler;
 import com.kc.exception.notice.process.DingTalkNoticeProcessor;
-import com.kc.exception.notice.process.MailNoticeProcessor;
 import com.kc.exception.notice.process.INoticeProcessor;
+import com.kc.exception.notice.process.MailNoticeProcessor;
 import com.kc.exception.notice.process.WeChatNoticeProcessor;
 import com.kc.exception.notice.properties.DingTalkProperties;
-import com.kc.exception.notice.properties.MailProperties;
 import com.kc.exception.notice.properties.ExceptionNoticeProperties;
+import com.kc.exception.notice.properties.MailProperties;
 import com.kc.exception.notice.properties.WeChatProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,8 +34,11 @@ public class ExceptionNoticeAutoConfiguration {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Autowired(required = false)
-    private MailSender mailSender;
+    private final MailSender mailSender;
+
+    public ExceptionNoticeAutoConfiguration(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     @Bean(initMethod = "start")
     public ExceptionNoticeHandler noticeHandler(ExceptionNoticeProperties properties) {
@@ -57,7 +59,7 @@ public class ExceptionNoticeAutoConfiguration {
             noticeProcessor = new MailNoticeProcessor(mailSender, email);
             noticeProcessors.add(noticeProcessor);
         }
-        Assert.isTrue(noticeProcessors.size() != 0, "Exception notification configuration is incorrect");
+        Assert.isTrue(!noticeProcessors.isEmpty(), "Exception notification configuration is incorrect");
         return new ExceptionNoticeHandler(properties, noticeProcessors);
     }
 
