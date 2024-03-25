@@ -10,6 +10,7 @@ import com.kc.exception.notice.properties.DingTalkProperties;
 import com.kc.exception.notice.properties.ExceptionNoticeProperties;
 import com.kc.exception.notice.properties.MailProperties;
 import com.kc.exception.notice.properties.WeChatProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -34,11 +35,9 @@ public class ExceptionNoticeAutoConfiguration {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private final MailSender mailSender;
+    @Autowired(required = false)
+    private MailSender mailSender;
 
-    public ExceptionNoticeAutoConfiguration(MailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     @Bean(initMethod = "start")
     public ExceptionNoticeHandler noticeHandler(ExceptionNoticeProperties properties) {

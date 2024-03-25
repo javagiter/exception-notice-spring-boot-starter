@@ -3,11 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.kongchong</groupId>
+    <groupId>com.github.javagiter</groupId>
     <artifactId>exception-notice-spring-boot-starter</artifactId>
     <name>exception-notice-spring-boot-starter</name>
     <version>1.2.5</version>
-    <url>https://github.com/kongchong/exception-notice-spring-boot-starter.git</url>
+    <url>https://github.com/javagiter/exception-notice-spring-boot-starter.git</url>
     <description>a spring boot starter for exception notice</description>
 
 
@@ -30,27 +30,26 @@
 
     <scm>
         <tag>master</tag>
-        <connection>scm:git:https://github.com/kongchong/exception-notice-spring-boot-starter.git</connection>
-        <developerConnection>scm:git:https://github.com/kongchong/exception-notice-spring-boot-starter.git</developerConnection>
-        <url>https://github.com/kongchong/exception-notice-spring-boot-starter.git</url>
+        <connection>scm:git:https://github.com/javagiter/exception-notice-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:https://github.com/javagiter/exception-notice-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/javagiter/exception-notice-spring-boot-starter.git</url>
     </scm>
 
     <developers>
         <developer>
-            <name>kongchong</name>
-            <email>1182701220@qq.com</email>
-            <url>http://www.kcblog.cn</url>
+            <name>javagiter</name>
+            <email>liutineco@gmail.com</email>
         </developer>
     </developers>
 
     <distributionManagement>
         <snapshotRepository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>central</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
         <repository>
-            <id>oss</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>central</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 
@@ -97,85 +96,21 @@
 
     <profiles>
         <profile>
-            <id>oss</id>
+            <id>central</id>
             <build>
                 <plugins>
-                    <!-- 资源文件拷贝插件 -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <configuration>
-                            <encoding>UTF-8</encoding>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- java编译插件 -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                            <encoding>${project.build.sourceEncoding}</encoding>
-                        </configuration>
-                    </plugin>
-                    <!-- Javadoc -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- GPG -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>${maven-gpg-plugin.version}</version>
-                        <executions>
-                            <execution>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.4.0</version>
+                    <extensions>true</extensions>
+                    <configuration>
+                        <publishingServerId>central</publishingServerId>
+                        <tokenAuth>true</tokenAuth>
+                    </configuration>
+                </plugin>
                 </plugins>
             </build>
-
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-                </snapshotRepository>
-                <repository>
-                    <id>oss</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-                </repository>
-            </distributionManagement>
         </profile>
 
     </profiles>

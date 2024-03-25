@@ -70,13 +70,14 @@ public class ExceptionInfo {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ExceptionInfo(Throwable ex, String methodName, String filterTrace, Object args, String reqAddress) {
+    public ExceptionInfo(Throwable ex, String methodName, List<String> includeTracePackages, Object args, String reqAddress) {
         this.exceptionMessage = gainExceptionMessage(ex);
         this.reqAddress = reqAddress;
         this.params = args;
         List<StackTraceElement> list = Arrays.stream(ex.getStackTrace())
-                .filter(x -> filterTrace == null || x.getClassName().startsWith(filterTrace))
-                .filter(x -> !"<generated>".equals(x.getFileName())).collect(toList());
+                .filter(x -> includeTracePackages == null || includeTracePackages.stream().allMatch(y -> x.getClassName().startsWith(y)))
+                .filter(x -> !"<generated>".equals(x.getFileName()))
+                .collect(toList());
         if (!list.isEmpty()) {
             this.classPath = list.get(0).getClassName();
             this.methodName = null == methodName ? list.get(0).getMethodName() : methodName;

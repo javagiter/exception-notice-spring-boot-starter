@@ -30,7 +30,7 @@ public class ExceptionNoticeProperties {
     /**
      * 追踪信息的包含的包名
      */
-    private String includedTracePackage;
+    private List<String> includedTracePackages;
     /**
      * 异常信息发送的时间周期 以秒为单位 默认5s
      */

@@ -51,24 +51,31 @@ public class ExceptionNoticeHandler {
      */
     @SuppressWarnings("java:S899")
     public void createNotice(Exception ex, JoinPoint joinPoint) {
-        if (containsException(ex)) {
+        if (excludeException(ex)) {
             return;
         }
         log.error("捕获到异常开始发送消息通知:{}method:{}--->", separator, joinPoint.getSignature().getName());
-        //获取请求参数
+        // 获取请求参数
         Object parameter = getParameter(joinPoint);
-        //获取当前请求对象
+        // 获取当前请求对象
+        ExceptionInfo exceptionInfo = getExceptionInfo(ex, joinPoint, parameter);
+        // 仅发送追踪的文件夹
+        if (exceptionInfo.getClassPath() != null && !exceptionInfo.getClassPath().isEmpty()) {
+            exceptionInfo.setProject(exceptionProperties.getProjectName());
+            exceptionInfoBlockingDeque.offer(exceptionInfo);
+        }
+    }
+
+    private ExceptionInfo getExceptionInfo(Exception ex, JoinPoint joinPoint, Object parameter) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         String address = null;
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();
-            //获取请求地址
+            // 获取请求地址
             address = request.getRequestURL().toString() + ((request.getQueryString() != null && !request.getQueryString().isEmpty()) ? "?" + request.getQueryString() : "");
         }
 
-        ExceptionInfo exceptionInfo = new ExceptionInfo(ex, joinPoint.getSignature().getName(), exceptionProperties.getIncludedTracePackage(), parameter, address);
-        exceptionInfo.setProject(exceptionProperties.getProjectName());
-        exceptionInfoBlockingDeque.offer(exceptionInfo);
+        return new ExceptionInfo(ex, joinPoint.getSignature().getName(), exceptionProperties.getIncludedTracePackages(), parameter, address);
     }
 
     /**
@@ -83,7 +90,7 @@ public class ExceptionNoticeHandler {
         }, 6, exceptionProperties.getPeriod(), TimeUnit.SECONDS);
     }
 
-    private boolean containsException(Exception exception) {
+    private boolean excludeException(Exception exception) {
         Class<? extends Exception> exceptionClass = exception.getClass();
         List<Class<? extends Exception>> list = exceptionProperties.getExcludeExceptions();
         for (Class<? extends Exception> clazz : list) {
