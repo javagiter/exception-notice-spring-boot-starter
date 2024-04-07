@@ -1,5 +1,6 @@
 package com.kc.exception.notice.handler;
 
+import com.kc.exception.notice.annotation.TargetExceptionNotice;
 import com.kc.exception.notice.content.ExceptionInfo;
 import com.kc.exception.notice.process.INoticeProcessor;
 import com.kc.exception.notice.properties.ExceptionNoticeProperties;
@@ -7,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,6 +61,31 @@ public class ExceptionNoticeHandler {
         Object parameter = getParameter(joinPoint);
         // 获取当前请求对象
         ExceptionInfo exceptionInfo = getExceptionInfo(ex, joinPoint, parameter);
+        offerQueue(exceptionInfo);
+    }
+
+    public void createTargetNotice(Exception ex, JoinPoint joinPoint) {
+        if (excludeException(ex)) {
+            return;
+        }
+        TargetExceptionNotice annotation = getTargetExceptionNoticeAnnotation(joinPoint);
+        String targetWebhook = null;
+        if (annotation != null) {
+            int webHookIndex = Integer.parseInt(annotation.webHookIndex());
+            String[] webHook = exceptionProperties.getWeChat().getWebHook();
+            Assert.isTrue(webHook.length > webHookIndex, "webHook array must greater than webHookIndex");
+            targetWebhook = webHook[webHookIndex];
+        }
+        log.error("捕获到异常开始发送消息通知:{}method:{}--->", separator, joinPoint.getSignature().getName());
+        // 获取请求参数
+        Object parameter = getParameter(joinPoint);
+        // 获取当前请求对象
+        ExceptionInfo exceptionInfo = getExceptionInfo(ex, joinPoint, parameter);
+        exceptionInfo.setTargetWebhook(targetWebhook);
+        offerQueue(exceptionInfo);
+    }
+
+    private void offerQueue(ExceptionInfo exceptionInfo) {
         // 仅发送追踪的文件夹
         if (exceptionInfo.getClassPath() != null && !exceptionInfo.getClassPath().isEmpty()) {
             exceptionInfo.setProject(exceptionProperties.getProjectName());
@@ -75,7 +102,7 @@ public class ExceptionNoticeHandler {
             address = request.getRequestURL().toString() + ((request.getQueryString() != null && !request.getQueryString().isEmpty()) ? "?" + request.getQueryString() : "");
         }
 
-        return new ExceptionInfo(ex, joinPoint.getSignature().getName(), exceptionProperties.getIncludedTracePackages(), parameter, address);
+        return new ExceptionInfo(ex, joinPoint.getSignature().getName(), exceptionProperties, parameter, address);
     }
 
     /**
@@ -139,4 +166,13 @@ public class ExceptionNoticeHandler {
     }
 
 
+    // 获取目标方法上的TargetExceptionNotice注解
+    private TargetExceptionNotice getTargetExceptionNoticeAnnotation(JoinPoint joinPoint) {
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        if (method.isAnnotationPresent(TargetExceptionNotice.class)) {
+            return method.getAnnotation(TargetExceptionNotice.class);
+        }
+        return null;
+    }
 }

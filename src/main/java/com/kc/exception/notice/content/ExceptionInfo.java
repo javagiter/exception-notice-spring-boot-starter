@@ -1,6 +1,7 @@
 package com.kc.exception.notice.content;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kc.exception.notice.properties.ExceptionNoticeProperties;
 import lombok.Data;
 import lombok.SneakyThrows;
 import org.springframework.util.DigestUtils;
@@ -59,6 +60,11 @@ public class ExceptionInfo {
     private String exceptionMessage;
 
     /**
+     * 自定义目标地址
+     */
+    private String targetWebhook;
+
+    /**
      * 异常追踪信息
      */
     private List<String> traceInfo = new ArrayList<>();
@@ -70,10 +76,12 @@ public class ExceptionInfo {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ExceptionInfo(Throwable ex, String methodName, List<String> includeTracePackages, Object args, String reqAddress) {
+    public ExceptionInfo(Throwable ex, String methodName, ExceptionNoticeProperties exceptionProperties, Object args, String reqAddress) {
         this.exceptionMessage = gainExceptionMessage(ex);
         this.reqAddress = reqAddress;
         this.params = args;
+        List<String> includeTracePackages = exceptionProperties.getIncludedTracePackages();
+        boolean isShowTrace = exceptionProperties.isShowTrace();
         List<StackTraceElement> list = Arrays.stream(ex.getStackTrace())
                 .filter(x -> includeTracePackages == null || includeTracePackages.stream().allMatch(y -> x.getClassName().startsWith(y)))
                 .filter(x -> !"<generated>".equals(x.getFileName()))
@@ -81,7 +89,9 @@ public class ExceptionInfo {
         if (!list.isEmpty()) {
             this.classPath = list.get(0).getClassName();
             this.methodName = null == methodName ? list.get(0).getMethodName() : methodName;
-            this.traceInfo = list.stream().map(StackTraceElement::toString).collect(toList());
+            if (isShowTrace) {
+                this.traceInfo = list.stream().map(StackTraceElement::toString).collect(toList());
+            }
         }
         this.uid = calUid();
     }

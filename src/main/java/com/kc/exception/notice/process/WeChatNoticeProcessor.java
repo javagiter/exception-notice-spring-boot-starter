@@ -23,7 +23,7 @@ public class WeChatNoticeProcessor implements INoticeProcessor {
 
     public WeChatNoticeProcessor(RestTemplate restTemplate,
                                  WeChatProperties weChatProperties) {
-        Assert.hasText(weChatProperties.getWebHook(), "WeChat webHook must not be null");
+        Assert.notEmpty(weChatProperties.getWebHook(), "WeChat webHook must not be null");
         this.weChatProperties = weChatProperties;
         this.restTemplate = restTemplate;
     }
@@ -31,7 +31,8 @@ public class WeChatNoticeProcessor implements INoticeProcessor {
     @Override
     public void sendNotice(ExceptionInfo exceptionInfo) {
         WeChatExceptionInfo weChatNoticeProcessor = new WeChatExceptionInfo(exceptionInfo, weChatProperties);
-        String result = restTemplate.postForObject(weChatProperties.getWebHook(), weChatNoticeProcessor, String.class);
+        String webHook = exceptionInfo.getTargetWebhook() == null ? weChatProperties.getWebHook()[0] : exceptionInfo.getTargetWebhook();
+        String result = restTemplate.postForObject(webHook, weChatNoticeProcessor, String.class);
         logger.debug(result);
     }
 

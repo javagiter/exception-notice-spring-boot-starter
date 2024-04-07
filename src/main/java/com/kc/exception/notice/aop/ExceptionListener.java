@@ -19,8 +19,16 @@ public class ExceptionListener {
 
     private final ExceptionNoticeHandler handler;
 
-    @AfterThrowing(value = "@within(org.springframework.web.bind.annotation.RestController) || @within(org.springframework.stereotype.Controller) || @within(com.kc.exception.notice.annotation.ExceptionNotice)", throwing = "e")
+    @AfterThrowing(value = "!@annotation(com.kc.exception.notice.annotation.TargetExceptionNotice) " +
+            "&& (@within(org.springframework.web.bind.annotation.RestController) || @within(org.springframework.stereotype.Controller) || @within(com.kc.exception.notice.annotation.ExceptionNotice)))", throwing = "e")
     public void doAfterThrow(JoinPoint joinPoint, Exception e) {
         handler.createNotice(e, joinPoint);
     }
+
+
+    @AfterThrowing(value = "@annotation(com.kc.exception.notice.annotation.TargetExceptionNotice)", throwing = "e")
+    public void doAfterThrowTarget(JoinPoint joinPoint, Exception e) {
+        handler.createTargetNotice(e, joinPoint);
+    }
+
 }

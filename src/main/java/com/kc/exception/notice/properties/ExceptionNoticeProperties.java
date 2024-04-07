@@ -54,4 +54,8 @@ public class ExceptionNoticeProperties {
      */
     @NestedConfigurationProperty
     private WeChatProperties weChat;
+    /**
+     * 异常追踪是否显示 默认显示
+     */
+    private boolean showTrace = true;
 }
