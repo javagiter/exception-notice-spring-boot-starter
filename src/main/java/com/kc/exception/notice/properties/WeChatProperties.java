@@ -26,7 +26,7 @@ public class WeChatProperties {
     /**
      * 企业微信机器人webHook地址
      */
-    private String[] webHook;
+    private String[] webHooks;
 
     /**
      * 消息类型 暂只支持text和markdown

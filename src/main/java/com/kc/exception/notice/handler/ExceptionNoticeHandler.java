@@ -72,9 +72,9 @@ public class ExceptionNoticeHandler {
         String targetWebhook = null;
         if (annotation != null) {
             int webHookIndex = Integer.parseInt(annotation.webHookIndex());
-            String[] webHook = exceptionProperties.getWeChat().getWebHook();
-            Assert.isTrue(webHook.length > webHookIndex, "webHook array must greater than webHookIndex");
-            targetWebhook = webHook[webHookIndex];
+            String[] webHooks = exceptionProperties.getWeChat().getWebHooks();
+            Assert.isTrue(webHooks.length > webHookIndex, "webHook array must greater than webHookIndex");
+            targetWebhook = webHooks[webHookIndex];
         }
         log.error("捕获到异常开始发送消息通知:{}method:{}--->", separator, joinPoint.getSignature().getName());
         // 获取请求参数

@@ -83,7 +83,7 @@ public class ExceptionInfo {
         List<String> includeTracePackages = exceptionProperties.getIncludedTracePackages();
         boolean isShowTrace = exceptionProperties.isShowTrace();
         List<StackTraceElement> list = Arrays.stream(ex.getStackTrace())
-                .filter(x -> includeTracePackages == null || includeTracePackages.stream().allMatch(y -> x.getClassName().startsWith(y)))
+                .filter(x -> includeTracePackages == null || includeTracePackages.stream().anyMatch(y -> x.getClassName().startsWith(y)))
                 .filter(x -> !"<generated>".equals(x.getFileName()))
                 .collect(toList());
         if (!list.isEmpty()) {
