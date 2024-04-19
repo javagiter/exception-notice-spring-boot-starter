@@ -20,4 +20,9 @@ public @interface TargetExceptionNotice {
      */
     String webHookIndex() default "0";
 
+    /**
+     * 指定发送
+     */
+    boolean showTrace() default true;
+
 }

@@ -72,6 +72,12 @@ public class ExceptionNoticeHandler {
         String targetWebhook = null;
         if (annotation != null) {
             int webHookIndex = Integer.parseInt(annotation.webHookIndex());
+            boolean targetShowTrace = annotation.showTrace();
+            // TargetExceptionNotice注解 是否显示堆栈
+            if(!targetShowTrace) {
+                exceptionProperties.setShowTrace(false);
+            }
+
             String[] webHooks = exceptionProperties.getWeChat().getWebHooks();
             Assert.isTrue(webHooks.length > webHookIndex, "webHook array must greater than webHookIndex");
             targetWebhook = webHooks[webHookIndex];

@@ -6,7 +6,7 @@
     <groupId>io.github.javagiter</groupId>
     <artifactId>exception-notice-spring-boot-starter</artifactId>
     <name>exception-notice-spring-boot-starter</name>
-    <version>1.2.7</version>
+    <version>1.2.10</version>
     <url>https://github.com/javagiter/exception-notice-spring-boot-starter.git</url>
     <description>a spring boot starter for exception notice</description>
 
