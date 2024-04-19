@@ -13,9 +13,9 @@ pom.xml中增加项目依赖
 本项目现已发布到maven中央仓库，可以直接通过以下坐标引入依赖
 ```
   <dependency>
-     <groupId>com.github.kongchong</groupId>
+     <groupId>io.github.javagiter</groupId>
      <artifactId>exception-notice-spring-boot-starter</artifactId>
-     <version>1.2.9</version>
+     <version>1.2.10</version>
   </dependency>
 ```
 #### 钉钉配置
@@ -73,12 +73,16 @@ exception:
     ## 企业微信配置
     we-chat:
       web-hooks: 
-        - 企业微信webhook地址，配合@TargetExceptionNotice(webHookIndex = "1")使用
+        - 企业微信webhook地址，配合@TargetExceptionNotice(webHookIndex = "1", showTrace = false)使用
       at-phones: 手机号列表，提醒手机号对应的群成员(@某个成员)，@all表示提醒所有人 当msg-type=text时才会生效
       at-user-ids: userid的列表，提醒群中的指定成员(@某个成员)，@all表示提醒所有人 当msg-type=text时才会生效
       msg-type: 消息格式 企业微信支持 （text）、markdown（markdown）、图片（image）、图文（news）四种消息类型 本项目中有 text和markdown两种可选
 
 ```
+#### @TargetExceptionNotice(webHookIndex = "1", showTrace = false)个性化异常注解
+webHookIndex值取自配置web-hooks: ，默认为0，指定发送企微群
+showTrace默认值true，注解标记的方法是否显示异常信息
+个性化异常注解优先级高于全局配置
 
 #### 邮箱配置
 这里以qq邮箱为例 
