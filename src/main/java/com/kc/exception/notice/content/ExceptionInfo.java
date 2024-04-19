@@ -1,6 +1,7 @@
 package com.kc.exception.notice.content;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kc.exception.notice.aop.ExceptionListener;
 import com.kc.exception.notice.properties.ExceptionNoticeProperties;
 import lombok.Data;
 import lombok.SneakyThrows;
@@ -89,7 +90,9 @@ public class ExceptionInfo {
         if (!list.isEmpty()) {
             this.classPath = list.get(0).getClassName();
             this.methodName = null == methodName ? list.get(0).getMethodName() : methodName;
-            if (isShowTrace) {
+            String targetShowTraceStr = ExceptionListener.threadLocalVariable.get();
+            ExceptionListener.threadLocalVariable.remove();
+            if (isShowTrace && (targetShowTraceStr == null || "true".equals(targetShowTraceStr))) {
                 this.traceInfo = list.stream().map(StackTraceElement::toString).collect(toList());
             }
         }

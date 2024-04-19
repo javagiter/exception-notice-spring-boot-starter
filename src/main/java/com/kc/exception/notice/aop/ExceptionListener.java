@@ -19,6 +19,8 @@ public class ExceptionListener {
 
     private final ExceptionNoticeHandler handler;
 
+    public static final ThreadLocal<String> threadLocalVariable = new ThreadLocal<>();
+
     @AfterThrowing(value = "!@annotation(com.kc.exception.notice.annotation.TargetExceptionNotice) " +
             "&& (@within(org.springframework.web.bind.annotation.RestController) || @within(org.springframework.stereotype.Controller) || @within(com.kc.exception.notice.annotation.ExceptionNotice)))", throwing = "e")
     public void doAfterThrow(JoinPoint joinPoint, Exception e) {

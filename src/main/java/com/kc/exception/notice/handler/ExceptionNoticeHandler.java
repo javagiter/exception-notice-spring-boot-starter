@@ -1,6 +1,7 @@
 package com.kc.exception.notice.handler;
 
 import com.kc.exception.notice.annotation.TargetExceptionNotice;
+import com.kc.exception.notice.aop.ExceptionListener;
 import com.kc.exception.notice.content.ExceptionInfo;
 import com.kc.exception.notice.process.INoticeProcessor;
 import com.kc.exception.notice.properties.ExceptionNoticeProperties;
@@ -75,7 +76,7 @@ public class ExceptionNoticeHandler {
             boolean targetShowTrace = annotation.showTrace();
             // TargetExceptionNotice注解 是否显示堆栈
             if(!targetShowTrace) {
-                exceptionProperties.setShowTrace(false);
+                ExceptionListener.threadLocalVariable.set("false");
             }
 
             String[] webHooks = exceptionProperties.getWeChat().getWebHooks();
