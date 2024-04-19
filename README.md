@@ -81,7 +81,7 @@ exception:
 ```
 #### @TargetExceptionNotice(webHookIndex = "1", showTrace = false)个性化异常注解
 个性化异常配置优先级高于全局配置
-webHookIndex值取自配置web-hooks: ，默认为0，指定发送企微群
+webHookIndex值取自配置web-hooks: ，默认为0，指定发送企微群；
 showTrace默认值true，注解标记的方法是否显示异常信息
 
 
